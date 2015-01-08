@@ -16,9 +16,9 @@ If you run under Windows with a computer that has an Nvidia card, you have to in
 For Mac or Linux users: 
 Presuming that cmake is installed, unzip the file somewhere, and open a command window in the build folder within the unzipped code folder. Now, run:
 
-cmake ..
-clear; make
-clear; make run
+cmake ..;
+make; 
+make run
 
 If you want to clear the build, type
 clear; make destroy
