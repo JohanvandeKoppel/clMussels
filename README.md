@@ -4,6 +4,9 @@ This repository contains the OpenCL code that runs the model describing spatial 
 
 Van de Koppel, J., Rietkerk, M., Dankers, M. & Herman, P.M.J. 2005 Scale-dependent feedback and regular spatial patterns in young mussel beds. The American Naturalist 165:E66-E77.
 
+An video of the output of the model can be found on: http://www.youtube.com/watch?v=eU_G995paWs
+This video has been produced by the code in this repository.
+
 Running the code requires an OpenCL-compatible graphics card and OpenCL drivers installed. On a Mac, this is natively done when Xcode has been installed, and the current code has been developed in Xcode using a Macbook pro 2012 edition. You can also compile and run the code from the command line on a Mac. I run it using the cmake package (www.cmake.org) that handles the generation of a suitable makefile. See further explanation below.
 
 On other computers, you have to install the drivers that come with a Nvidia/AMD or Intel graphics card, and use the sample or SDK files to build from.
