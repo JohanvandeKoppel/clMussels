@@ -7,18 +7,18 @@ PlotAll = off;
 TitleFontSize = 24;
 BarFontSize   = 18;
 
-FID=fopen('Mussels.dat', 'r');
+FID=fopen('Output.dat', 'r');
 
-X=fread(FID,1,'int32');
-Y=fread(FID,1,'int32');
-Z=fread(FID,1,'int32');
+NX=fread(FID,1,'int32');
+NY=fread(FID,1,'int32');
 Length=fread(FID,1,'float');
+NumStored=fread(FID,1,'int32');
 EndTime=fread(FID,1,'int32');
 
-ArrayMemSize=X*Y*Z;
+ArrayMemSize=NX*NY*NumStored;
 
-A=zeros(X,Y,'double');
-M=zeros(X,Y,'double');
+A=zeros(NX,NY,'double');
+M=zeros(NX,NY,'double');
 
 if Movie==on,
     writerObj = VideoWriter('Mussels in the flow.mp4', 'MPEG-4');
@@ -44,7 +44,7 @@ else
     subplot('position',[0.07 0.075 0.9 0.85]);
 end;
 
-F1=imagesc(M(1:X,1:Y)',[0 1500]);
+F1=imagesc(M(1:NX,1:NY)',[0 1500]);
 title('Mussel density (g/m^2)','FontSize',TitleFontSize);  
 colorbar('SouthOutside','FontSize',BarFontSize);
 colormap('default'); axis image; axis ij; axis off;
@@ -58,14 +58,14 @@ if PlotAll==on,
 end;
     
 
-for i=1:Z-1,  
+for i=1:NumStored-1,  
     
-    A=reshape(fread(FID,X*Y,'float32'),X,Y);
-    M=reshape(fread(FID,X*Y,'float32'),X,Y);   
+    A=reshape(fread(FID,NX*NY,'float32'),NX,NY);
+    M=reshape(fread(FID,NX*NY,'float32'),NX,NY);   
 
     set(F1,'CData',M');
     if PlotAll==on, set(F2,'CData',A');end;
-    set(Figure1,'Name',['Timestep ' num2str((i+1)/Z*EndTime/24,'%1.0f') ' of ' num2str(EndTime/24) ' days']); 
+    set(Figure1,'Name',['Timestep ' num2str((i+1)/NumStored*EndTime/24,'%1.0f') ' of ' num2str(EndTime/24) ' days']); 
 
     drawnow; 
 

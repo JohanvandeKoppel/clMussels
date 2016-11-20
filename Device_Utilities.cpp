@@ -16,7 +16,7 @@
 void print_platform_info(cl_platform_id platform)
 {
     char name[128];
-    char vendor[128];
+    char vendor[128]; 
     
     clGetPlatformInfo(platform, CL_PLATFORM_NAME, 128, name, NULL);
     clGetPlatformInfo(platform, CL_PLATFORM_VENDOR, 128, vendor, NULL);

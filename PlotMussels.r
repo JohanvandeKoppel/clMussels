@@ -6,18 +6,20 @@ setwd('/Simulations/OpenCL/clMussels/clMussels')
 
 require(fields)
 
-FID = file("Mussels.dat", "rb")
+FileName = "Output.dat"
+cat(paste("Data file date :",file.info(FileName )$mtime ),"\n")
+FID = file(FileName, "rb")
 
-Movie=on
+Movie=off
 Wait=off
 WinWidth = 960
 WinHeight = 720
 
-NX = readBin(FID, integer(), n = 1, endian = "little");
-NY = readBin(FID, integer(), n = 1, endian = "little");
+NX =        readBin(FID, integer(), n = 1, endian = "little");
+NY =        readBin(FID, integer(), n = 1, endian = "little");
+Length =    readBin(FID, numeric(), size=4, n = 1, endian = "little")
 NumFrames = readBin(FID, integer(), n = 1, endian = "little");
-Length=readBin(FID,  numeric(), size=4, n = 1, endian = "little")
-EndTime=readBin(FID,  integer(), n = 1, endian = "little")
+EndTime =   readBin(FID, integer(), n = 1, endian = "little")
 
 DPI=144
 
@@ -49,7 +51,7 @@ for (jj in 0:(NumFrames-1)){  # Here the time loop starts
    title("Mussel density")   
    
 #   mtext(text=paste("Time : ",sprintf("%1.0f",jj),
-#                     "of" ,sprintf("%1.0f",NumFrames), "Frames"), 
+#                    "of" ,sprintf("%1.0f",NumFrames), "Frames"), 
 #      side=1, adj=0.5, line=0.5, cex=1)
 
    mtext(text=sprintf("Time : %1.0f of %1.0f Days", (jj+1)/NumFrames*EndTime/24, EndTime/24), 

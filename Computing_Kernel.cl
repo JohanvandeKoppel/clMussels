@@ -4,25 +4,22 @@
 // Laplacation operator definition, to calculate diffusive fluxes
 ////////////////////////////////////////////////////////////////////////////////
 
-float LaplacianXY(__global float* pop, int row, int column)
+float d2_dxy2(__global float* pop, int row, int column)
 {
-	float retval;
-	int current, left, right, top, bottom;
-	float dx = dX;
-	float dy = dY;
-	
-	current=row * Grid_Width + column;
-	left=row * Grid_Width + column-1;
-	right=row * Grid_Width + column+1;
-	top=(row-1) * Grid_Width + column;
-	bottom=(row+1) * Grid_Width + column;
+    float retval;
+    float dx = dX;
+    float dy = dY;
     
-	retval = ( (( pop[current] - pop[left] )/dx )
-		      -(( pop[right]   - pop[current] )/dx )) / dx +
-             ( (( pop[current] - pop[top] )/dy  )
-              -(( pop[bottom]  - pop[current] )/dy ) ) / dy;
+    int current = row * Grid_Width + column;
+    int left    = row * Grid_Width + column-1;
+    int right   = row * Grid_Width + column+1;
+    int top     = (row-1) * Grid_Width + column;
+    int bottom  = (row+1) * Grid_Width + column;
     
-	return retval;
+    retval = ( ( pop[left] + pop[right]  - 2*pop[current] ) /dx/dx +
+               ( pop[top]  + pop[bottom] - 2*pop[current] ) /dy/dy );
+    
+    return retval;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,14 +27,13 @@ float LaplacianXY(__global float* pop, int row, int column)
 ////////////////////////////////////////////////////////////////////////////////
 
 
-float GradientY(__global float* pop, int row, int column)
+float d_dy(__global float* pop, int row, int column)
 {
 	float retval;
-	int current, top;
 	float dy = dY;
 	
-	current=row * Grid_Width + column;
-	top=(row-1) * Grid_Width + column;
+	int current=row * Grid_Width + column;
+	int top=(row-1) * Grid_Width + column;
 	
 	retval =  (( pop[current] - pop[top] )/dy );
     
@@ -48,40 +44,21 @@ float GradientY(__global float* pop, int row, int column)
 // Simulation kernel
 ////////////////////////////////////////////////////////////////////////////////
 
-__kernel void MusselsKernel (__global float* A, __global float* M)
+__kernel void SimulationKernel (__global float* A, __global float* M)
 {
     
-    float dAdx;
-	float d2Mdxy2;;
 	float Consumption;
-    
-	float Dx=D*EX;       // Accelarated parameters (by EX)
-	float ex=ee*EX;       // Accelarated parameters (by EX)
-	float dMx=dM*EX;   // Accelarated parameters (by EX)
 	
-    #if  SetGrid2D==ON
-        size_t row = get_global_id(0);
-        size_t column = get_global_id(1);
-    
-        int current = row * Grid_Width + column;
-    #else
-        size_t current = get_global_id(0);
-	
-	    int row		= floor((float)current/(float)Grid_Width);
-	    int column	= current%Grid_Width;
-    #endif
+    size_t current  = get_global_id(0);
+    int    row      = floor((float)current/(float)Grid_Width);
+    int    column   = current%Grid_Width;
 	
 	if (row > 0 && row < Grid_Width-1)
     {
+		float Consumption = cc * A[current] * M[current];
         
-		dAdx	= GradientY(A, row, column);
-        d2Mdxy2 = LaplacianXY(M, row, column);
-        
-		Consumption = cc * A[current] * M[current];
-        
-		A[current]=A[current]+(ff*(Aup-A[current]) - Consumption/hh - V*dAdx)*dT;
-		M[current]=M[current]+(ex*Consumption - dMx*M[current]*kM/(kM+M[current]) - Dx*d2Mdxy2)*dT;
-        
+		A[current]=A[current]+(ff*(Aup-A[current]) - Consumption/hh - V*d_dy(A, row, column))*dT;
+		M[current]=M[current]+EX*(ee*Consumption - dM*M[current]*kM/(kM+M[current]) + D*d2_dxy2(M, row, column))*dT;
     }
     
     //barrier(CLK_LOCAL_MEM_FENCE);
