@@ -2,7 +2,7 @@ clear all; clc;
 on=1;off=0;
 
 Movie   = off;
-PlotAll = off;
+PlotAll = on;
 
 TitleFontSize = 24;
 BarFontSize   = 18;
@@ -51,7 +51,7 @@ colormap('default'); axis image; axis ij; axis off;
 
 if PlotAll==on,
     subplot('position',[0.52 0.075 0.45 0.85]);    
-    F2=imagesc(A(1:X,1:Y)',[0 1.500]);
+    F2=imagesc(A(1:NX,1:NY)',[0 1.500]);
     title('Algal concentration (mg/l)','FontSize',TitleFontSize);  
     colorbar('SouthOutside','FontSize',BarFontSize);
     colormap('default'); axis image; axis ij; axis off;
