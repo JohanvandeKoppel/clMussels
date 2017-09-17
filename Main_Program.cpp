@@ -20,8 +20,6 @@
 #include <CL/cl.h>
 #endif
 
-#define MAX_SOURCE_SIZE (0x100000)
-
 ////////////////////////////////////////////////////////////////////////////////
 // Main program code for Mussels
 ////////////////////////////////////////////////////////////////////////////////
@@ -31,30 +29,30 @@ int main()
     
     /*----------Constant and variable definition------------------------------*/
     
-	unsigned int Grid_Memory = sizeof(float) * Grid_Size;
-	unsigned int size_storegrid = Grid_Width * Grid_Height * MAX_STORE;
-	unsigned int mem_size_storegrid = sizeof(float) * size_storegrid;
+	size_t Grid_Memory = sizeof(float) * Grid_Size;
+	size_t size_storegrid = Grid_Width * Grid_Height * MAX_STORE;
+	size_t mem_size_storegrid = sizeof(float) * size_storegrid;
     
     /*----------Defining and allocating memeory on host-----------------------*/
     
-    // Defining and allocating the memory blocks for P, W, and O on the host (h)
+    // Defining and allocating the memory blocks on the host (h)
     float* h_V1 = (float *)malloc(Grid_Width*Grid_Height*sizeof(float));
 	float* h_V2 = (float *)malloc(Grid_Width*Grid_Height*sizeof(float));
 	
-    // Defining and allocating storage blocks for P, W, and O on the host (h)
+    // Defining and allocating storage blocks on the host (h)
     float* h_store_V1=(float*) malloc(mem_size_storegrid);
 	float* h_store_V2=(float*) malloc(mem_size_storegrid);
     
     /*----------Initializing the host arrays----------------------------------*/
     
-    srand(50); // Seeding the random number generator
+    srand(RandSeed); // Seeding the random number generator
     
-	randomInit(h_V1, Grid_Width, Grid_Height, ALGAE);
-	randomInit(h_V2, Grid_Width, Grid_Height, MUSSELS);
+	Initialize(h_V1, Grid_Width, Grid_Height, 101);
+	Initialize(h_V2, Grid_Width, Grid_Height, 102);
     
     /*----------Printing info to the screen ----------------------------------*/
 
-    Print_Label();
+    Print_Label(); // Prints a bit of explanation, see "Initial_values.h"
     
 	printf(" Current grid dimensions: %d x %d cells\n\n",
            Grid_Width, Grid_Height);
@@ -74,7 +72,7 @@ int main()
     // Create a command queue on the device
     cl_command_queue command_queue = clCreateCommandQueue(context, devices[Device_No], 0, &err);
     
-    /*----------Create Buffer Objects for A and M on the device-------------*/
+    /*----------Create Buffer Objects for the matrices on the device ---------*/
     
 	cl_mem d_V1 = clCreateBuffer(context, CL_MEM_READ_WRITE, Grid_Memory, NULL, &err);
 	cl_mem d_V2 = clCreateBuffer(context, CL_MEM_READ_WRITE, Grid_Memory, NULL, &err);
@@ -168,18 +166,14 @@ int main()
     
 	FILE * fp=fopen(DataPath.c_str(),"wb");
 
-    int width_matrix = Grid_Width;
-    int height_matrix = Grid_Height;
-    int NumStored = NumFrames;
-    float Length = dX*(float)Grid_Width;
-    int EndTimeVal = RealTime;
-
-	// Storing parameters
-	fwrite(&width_matrix,sizeof(int),1,fp);
-	fwrite(&height_matrix,sizeof(int),1,fp);
-    fwrite(&Length,sizeof(float),1,fp);
-	fwrite(&NumStored,sizeof(int),1,fp);
-	fwrite(&EndTimeVal,sizeof(int),1,fp);
+    int Val_int;
+    float Val_float;
+    
+    Val_int = Grid_Width ; fwrite(&Val_int,sizeof(int),1,fp);
+    Val_int = Grid_Height; fwrite(&Val_int,sizeof(int),1,fp);
+    Val_float = dX*(float)Grid_Width; fwrite(&Val_float,sizeof(float),1,fp);
+    Val_int = NumFrames; fwrite(&Val_int,sizeof(int),1,fp);
+    Val_int = RealTime; fwrite(&Val_int,sizeof(int),1,fp);
 	
 	for(int store_i=0;store_i<NumFrames;store_i++)
     {

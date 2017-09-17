@@ -12,37 +12,22 @@
 // Allocates a matrix with random float entries
 ////////////////////////////////////////////////////////////////////////////////
 
-void randomInit (float* data, int x_siz, int y_siz, int type)
+void Initialize (float* data, size_t x_siz, size_t y_siz, int type)
 {
-    int i,j;
-    for(i=0;i<y_siz;i++)
+    for(size_t i=0;i<y_siz;i++)
     {
-        for(j=0;j<x_siz;j++)
+        for(size_t j=0;j<x_siz;j++)
         {
-            //assigning the first row last row and
-            //first column last column as zeroes
-            
-            if(i==0||i==y_siz-1||j==0||j==x_siz-1)
-                data[i*y_siz+j]=0.5f;
-            else
-            {
-                //for every other element find the correct initial
-                //value using the conditions below
-                if(type==MUSSELS)
-                {
-                    //printf(" %4.5f ",(rand() / (float)RAND_MAX));
-                    if((rand() / (float)RAND_MAX)<0.10f)
-                        data[i*y_siz+j] = (float)775.0f;
-                    else
-                        data[i*y_siz+j] = (float)25.0f;
-                    
-                }
-                else if(type==ALGAE)
-                    data[i*y_siz+j]=0.6f;
-            }
+            //for every other element find the correct initial
+            //value using the conditions below
+            if(type==MUSSELS)
+              { data[i*y_siz+j] = ((rand() / (float)RAND_MAX)<0.1f)? 1200.0: 100.0; }
+            else if(type==ALGAE)
+              { data[i*y_siz+j] = 0.6; }
+
         }
     }
-} // End randomInit
+} // End Initialize
 
 ////////////////////////////////////////////////////////////////////////////////
 // Prints the model name and additional info

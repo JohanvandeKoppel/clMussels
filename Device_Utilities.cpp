@@ -29,14 +29,7 @@ void print_device_info(cl_device_id* device, int Device_Nr)
     char* value;
     size_t valueSize;
     
-    // print device name
-    clGetDeviceInfo(device[Device_Nr], CL_DEVICE_VENDOR, 0, NULL, &valueSize);
-    value = (char*) malloc(valueSize);
-    clGetDeviceInfo(device[Device_Nr], CL_DEVICE_VENDOR, valueSize, value, NULL);
-    printf("%s", value);
-    free(value);
-    
-    // print hardware device version
+    //print device name
     clGetDeviceInfo(device[Device_Nr], CL_DEVICE_NAME, 0, NULL, &valueSize);
     value = (char*) malloc(valueSize);
     clGetDeviceInfo(device[Device_Nr], CL_DEVICE_NAME, valueSize, value, NULL);
@@ -151,6 +144,8 @@ cl_program BuildKernelFile(std::string filename, cl_context context, cl_device_i
     if (ret!=0) { printf(" > Compile program Error No: %d \n\n", ret); exit(ret);}
     
     free(fileString);
+    
+    //printf("%s\n", IncludeFolder.c_str());
     
     /* Build the kernel program */
     ret = clBuildProgram(prog, 1, device, IncludeFolder.c_str(), NULL, NULL);
